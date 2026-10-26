@@ -3,18 +3,14 @@
 // servidor) y los reenvía a la API de Anthropic.
 
 // Límites para evitar que alguien use este endpoint como proxy gratuito
-// Modelos válidos de la API pública: claude-sonnet-5-5 (equilibrado),
-// claude-haiku-5-5 (más barato), claude-opus-4-8 (más capaz)
 const MODELO_PERMITIDO = "claude-sonnet-5-5";
-const MAX_TOKENS = 1000;
+const MAX_TOKENS = 2000; // margen extra por si el modelo usa tokens para razonar
 const MAX_CARACTERES = 6000;
 
 export default async function handler(req, res) {
   const apiKey = process.env.ANTHROPIC_API_KEY;
 
   // --- AUTO-TEST ---
-  // Si entrás a /api/chat desde el navegador (GET), te dice si la clave está
-  // configurada SIN mostrarla nunca. Sirve para diagnosticar el despliegue.
   if (req.method === "GET") {
     return res.status(200).json({
       ok: true,
@@ -46,7 +42,7 @@ export default async function handler(req, res) {
       }
     }
 
-    const { messages, max_tokens } = body || {};
+    const { messages } = body || {};
 
     // Validación: tiene que venir un array de mensajes
     if (!Array.isArray(messages) || messages.length === 0) {
@@ -62,7 +58,7 @@ export default async function handler(req, res) {
     // Forzamos modelo y tokens — ignoramos lo que mande el cliente
     const payload = {
       model: MODELO_PERMITIDO,
-      max_tokens: Math.min(max_tokens || MAX_TOKENS, MAX_TOKENS),
+      max_tokens: MAX_TOKENS,
       messages: messages,
     };
 
@@ -86,7 +82,37 @@ export default async function handler(req, res) {
       });
     }
 
-    return res.status(200).json(data);
+    // Los modelos nuevos pueden devolver primero un bloque de "razonamiento"
+    // y recién después el bloque de texto. La app lee content[0].text, así que
+    // acá dejamos SOLO el texto, en el primer lugar, siempre.
+    const bloques = Array.isArray(data.content) ? data.content : [];
+    const texto = bloques
+      .filter((b) => b && b.type === "text" && typeof b.text === "string")
+      .map((b) => b.text)
+      .join("\n\n")
+      .trim();
+
+    if (!texto) {
+      // Si no hay texto, devolvemos un aviso visible (en vez de una burbuja vacía)
+      const tipos = bloques.map((b) => b && b.type).join(",") || "ninguno";
+      console.error("Respuesta sin texto. stop_reason:", data.stop_reason, "tipos:", tipos);
+      return res.status(200).json({
+        content: [
+          {
+            type: "text",
+            text: "No pude armar la respuesta (stop: " + data.stop_reason + ", bloques: " + tipos + "). Intentá de nuevo.",
+          },
+        ],
+      });
+    }
+
+    return res.status(200).json({
+      id: data.id,
+      role: data.role,
+      model: data.model,
+      stop_reason: data.stop_reason,
+      content: [{ type: "text", text: texto }],
+    });
   } catch (e) {
     console.error("Error en /api/chat:", e);
     return res.status(500).json({ error: "Error interno del servidor", detalle: String(e) });
