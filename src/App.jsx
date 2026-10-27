@@ -1,4 +1,4 @@
-    import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 
 const QUESTIONS_ES = [
   {id:"situacion",pregunta:"¿Cómo describirías tu situación económica hoy?",sub:"Sé honesto/a. Nadie más lo verá.",
@@ -44,10 +44,12 @@ const LECCIONES = [
 
 const FREE_LESSONS = 5;
 const FORM = "https://docs.google.com/forms/d/e/1FAIpQLSf__KOLz0LH-ASXXiFwwktnfqnFi6-8CrpTBXaXD-13GJ_-gA/viewform?usp=sharing";
-// 💳 PAGO PRO — Reemplazá esta URL con tu link de MercadoPago o Stripe
-// MercadoPago: https://mpago.la/TU_LINK_AQUI
-// Stripe: https://buy.stripe.com/TU_LINK_AQUI
-const PRO_PAYMENT_LINK = "https://mpago.la/HENDY_PRO"; // ← reemplazar con link real
+// 💳 PAGO PRO — el pago se coordina por WhatsApp: la persona pide su link de pago,
+// paga, y vos le das un código de activación (se genera en /api/generar-codigo).
+const PRO_WHATSAPP = "595971653879"; // 0971 653 879 con código de país de Paraguay
+const PRO_PRICE_GS = "15.000";
+const PRO_COACH_LIMIT = 100; // preguntas al Coach por mes con Pro
+const fmtFecha = (ms)=>{ const d=new Date(Number(ms)); const p=n=>String(n).padStart(2,"0"); return p(d.getDate())+"/"+p(d.getMonth()+1)+"/"+d.getFullYear(); };
 const CAT_COLOR = {Ahorro:"#facc15",Básicos:"#60a5fa",Deudas:"#f87171",Pagos:"#4ade80",Emprender:"#c084fc",Inversión:"#fb923c",Poupança:"#facc15",Dívidas:"#f87171",Pagamentos:"#4ade80",Empreender:"#c084fc",Investimento:"#fb923c"};
 
 const LESSON_ES = {
@@ -704,12 +706,13 @@ const FREE_COACH_LIMIT = 5;
 
 function CoachIA({userData, completed, lang, isPro, onBack, onAction}){
   const pt = lang==="pt";
-  const monthKey = "hendy_coach_v1_"+new Date().getFullYear()+"_"+new Date().getMonth();
+  const monthKey = (isPro?"hendy_coachpro_v1_":"hendy_coach_v1_")+new Date().getFullYear()+"_"+new Date().getMonth();
   const [usage,setUsage] = useState(()=>{
     try{ return JSON.parse(localStorage.getItem(monthKey)||"0"); }catch(e){ return 0; }
   });
-  const remaining = isPro ? null : Math.max(0, FREE_COACH_LIMIT - usage);
-  const blocked = !isPro && remaining<=0;
+  const coachLimit = isPro ? PRO_COACH_LIMIT : FREE_COACH_LIMIT;
+  const remaining = Math.max(0, coachLimit - usage);
+  const blocked = remaining<=0;
 
   const [messages,setMessages] = useState([{
     role:"assistant",
@@ -758,11 +761,9 @@ function CoachIA({userData, completed, lang, isPro, onBack, onAction}){
       const text = data.content&&data.content[0]?data.content[0].text:(pt?"Não consegui responder agora. Tente novamente.":"No pude responder ahora. Intentá de nuevo.");
       setMessages(m=>[...m,{role:"assistant",text}]);
       onAction&&onAction();
-      if(!isPro){
-        const nu = usage+1;
-        setUsage(nu);
-        try{ localStorage.setItem(monthKey, JSON.stringify(nu)); }catch(e){}
-      }
+      const nu = usage+1;
+      setUsage(nu);
+      try{ localStorage.setItem(monthKey, JSON.stringify(nu)); }catch(e){}
     }catch(e){
       setMessages(m=>[...m,{role:"assistant",text:pt?"Erro de conexão. Tente novamente em instantes.":"Error de conexión. Intentá de nuevo en un momento."}]);
     }
@@ -777,7 +778,7 @@ function CoachIA({userData, completed, lang, isPro, onBack, onAction}){
         <div style={{flex:1}}>
           <div style={{fontFamily:'"Plus Jakarta Sans",sans-serif',fontWeight:700,fontSize:15,color:"#fff"}}>{pt?"Coach Hendy":"Coach Hendy"}</div>
           <div style={{fontFamily:'"DM Sans",sans-serif',fontSize:11,color:"#666"}}>
-            {isPro?(pt?"Perguntas ilimitadas ⭐":"Preguntas ilimitadas ⭐"):(pt?`${remaining} perguntas restantes este mês`:`${remaining} preguntas restantes este mes`)}
+            {pt?`${remaining} perguntas restantes este mês`:`${remaining} preguntas restantes este mes`}{isPro?" ⭐":""}
           </div>
         </div>
       </div>
@@ -809,10 +810,14 @@ function CoachIA({userData, completed, lang, isPro, onBack, onAction}){
           <div style={{background:"linear-gradient(135deg,#1a1208,#120a1a)",border:"1px solid #facc1544",borderRadius:18,padding:18,textAlign:"center",marginTop:8}}>
             <div style={{fontSize:26,marginBottom:8}}>⭐</div>
             <div style={{fontFamily:'"Plus Jakarta Sans",sans-serif',fontWeight:700,fontSize:14,color:"#facc15",marginBottom:6}}>
-              {pt?"Você usou suas perguntas grátis deste mês":"Usaste tus preguntas gratis de este mes"}
+              {isPro
+                ?(pt?`Você usou as ${PRO_COACH_LIMIT} perguntas deste mês`:`Usaste tus ${PRO_COACH_LIMIT} preguntas de este mes`)
+                :(pt?"Você usou suas perguntas grátis deste mês":"Usaste tus preguntas gratis de este mes")}
             </div>
             <div style={{fontFamily:'"DM Sans",sans-serif',fontSize:12,color:"#aaa",lineHeight:1.6}}>
-              {pt?"Assine o Hendy Pro para perguntas ilimitadas ao coach.":"Suscribite a Hendy Pro para preguntas ilimitadas al coach."}
+              {isPro
+                ?(pt?"O limite se renova no dia 1º do próximo mês.":"El límite se renueva el día 1 del próximo mes.")
+                :(pt?`Assine o Hendy Pro e tenha ${PRO_COACH_LIMIT} perguntas por mês com o coach.`:`Suscribite a Hendy Pro y tené ${PRO_COACH_LIMIT} preguntas al mes con el coach.`)}
             </div>
           </div>
         )}
@@ -933,7 +938,7 @@ function Academy({userData,streak,completed,onComplete,isPro,onUpgrade,lang}){
       </div>}
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
         <div style={{fontSize:11,fontFamily:'"DM Sans",sans-serif',color:"#888",letterSpacing:"2px",textTransform:"uppercase"}}>{pt?"Todas as lições":"Todas las lecciones"} ({LECCIONES.length})</div>
-        {!isPro&&<div style={{background:"#1a1208",border:"1px solid #facc1533",borderRadius:100,padding:"4px 10px",fontFamily:'"DM Sans",sans-serif',fontSize:10,color:"#facc15"}}>{FREE_LESSONS} {pt?"grátis · Pro ilimitado":"gratis · Pro ilimitado"}</div>}
+        {!isPro&&<div style={{background:"#1a1208",border:"1px solid #facc1533",borderRadius:100,padding:"4px 10px",fontFamily:'"DM Sans",sans-serif',fontSize:10,color:"#facc15"}}>{FREE_LESSONS} {pt?"grátis · Pro completo":"gratis · Pro completo"}</div>}
       </div>
       <div style={{display:"flex",flexDirection:"column",gap:10}}>
         {LECCIONES.map((l,i)=>{
@@ -961,7 +966,8 @@ function Academy({userData,streak,completed,onComplete,isPro,onUpgrade,lang}){
           {[pt?"📚 21 lições disponíveis todo mês":"📚 21 lecciones disponibles cada mes",
             pt?"🔄 Lições renovadas no 1° de cada mês":"🔄 Lecciones renovadas el 1° de cada mes",
             pt?"🤖 +1 lição IA exclusiva ao concluir as 21":"🤖 +1 lección IA exclusiva al completar las 21",
-            pt?"💰 Solo R$10/mês · Cancele quando quiser":"💰 Solo $2/mes · Cancelá cuando quieras"
+            pt?`💬 Coach IA: ${PRO_COACH_LIMIT} perguntas por mês`:`💬 Coach IA: ${PRO_COACH_LIMIT} preguntas por mes`,
+            pt?`💰 Gs. ${PRO_PRICE_GS}/mês (≈ US$ 2) · Sem renovação automática`:`💰 Gs. ${PRO_PRICE_GS}/mes (≈ US$ 2) · Sin renovación automática`
           ].map((item,i)=>(
             <div key={i} style={{fontFamily:'"DM Sans",sans-serif',fontSize:13,color:"#ccc",display:"flex",alignItems:"center",gap:8}}>{item}</div>
           ))}
@@ -972,17 +978,37 @@ function Academy({userData,streak,completed,onComplete,isPro,onUpgrade,lang}){
   );
 }
 
-function ProScreen({onActivate,onBack,lang}){
+function ProScreen({onActivate,onBack,lang,userName}){
   const pt=lang==="pt";
-  const [payOpened,setPayOpened]=useState(false);
-  const [confirming,setConfirming]=useState(false);
-  const feats=pt?["📚 21 lições por mês + IA personalizada","🧠 Plano financeiro gerado pela IA","🎯 Diagnóstico completo do seu perfil","🏆 Todas as conquistas desbloqueadas","🔄 Lições renovadas todo mês"]:["📚 21 lecciones por mes + IA personalizada","🧠 Plan financiero generado por IA","🎯 Diagnóstico completo de tu perfil","🏆 Todos los logros desbloqueados","🔄 Lecciones renovadas cada mes"];
-  const handlePay=()=>{
-    window.open(PRO_PAYMENT_LINK,"_blank");
-    setPayOpened(true);
+  const [code,setCode]=useState("");
+  const [busy,setBusy]=useState(false);
+  const [err,setErr]=useState("");
+  const feats=pt?["📚 21 lições por mês + IA personalizada","🧠 Plano financeiro gerado pela IA","💬 Coach IA: "+PRO_COACH_LIMIT+" perguntas por mês","🎯 Diagnóstico completo do seu perfil","🏆 Todas as conquistas desbloqueadas","🔄 Lições renovadas todo mês"]:["📚 21 lecciones por mes + IA personalizada","🧠 Plan financiero generado por IA","💬 Coach IA: "+PRO_COACH_LIMIT+" preguntas por mes","🎯 Diagnóstico completo de tu perfil","🏆 Todos los logros desbloqueados","🔄 Lecciones renovadas cada mes"];
+  const waText=pt
+    ?"Olá! Quero ativar o Hendy Pro (Gs. "+PRO_PRICE_GS+"/mês). Meu nome no app é "+(userName||"")+"."
+    :"¡Hola! Quiero activar Hendy Pro (Gs. "+PRO_PRICE_GS+"/mes). Mi nombre en la app es "+(userName||"")+".";
+  const openWhatsApp=()=>{ window.open("https://wa.me/"+PRO_WHATSAPP+"?text="+encodeURIComponent(waText),"_blank"); };
+  const activate=async()=>{
+    const c=code.trim();
+    if(!c||busy)return;
+    setBusy(true);setErr("");
+    try{
+      const res=await fetch("/api/activar",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({codigo:c})});
+      const data=await res.json().catch(()=>({}));
+      if(res.ok&&data.ok&&data.hasta){
+        onActivate(data.hasta);
+      }else if(data.error==="codigo_vencido"){
+        setErr(pt?"Este código venceu. Peça um novo pelo WhatsApp.":"Este código venció. Pedí uno nuevo por WhatsApp.");
+      }else{
+        setErr(pt?"Código inválido. Confira se está digitado corretamente.":"Código inválido. Revisá que esté bien escrito.");
+      }
+    }catch(e){
+      setErr(pt?"Sem conexão. Tente novamente.":"Sin conexión. Intentá de nuevo.");
+    }
+    setBusy(false);
   };
   return(
-    <div style={{width:"100%",maxWidth:390,minHeight:"100vh",display:"flex",flexDirection:"column",padding:"56px 28px 40px",animation:"fadeIn .4s ease"}}>
+    <div style={{width:"100%",maxWidth:390,minHeight:"100vh",display:"flex",flexDirection:"column",padding:"56px 28px 130px",animation:"fadeIn .4s ease"}}>
       <button onClick={onBack} style={{background:"#161616",border:"1px solid #2a2a2a",borderRadius:12,color:"#ccc",cursor:"pointer",fontFamily:'"DM Sans",sans-serif',fontSize:13,fontWeight:500,marginBottom:36,padding:"8px 14px",display:"flex",alignItems:"center",gap:6,width:"fit-content"}}>{pt?"← Voltar":"← Volver"}</button>
       <div style={{textAlign:"center",marginBottom:32}}>
         <div style={{fontSize:52,marginBottom:16}}>🔥</div>
@@ -990,45 +1016,33 @@ function ProScreen({onActivate,onBack,lang}){
         <h1 style={{fontFamily:'"Plus Jakarta Sans",sans-serif',fontWeight:800,fontSize:32,color:"#fff",letterSpacing:"-1.5px",lineHeight:1.1,marginBottom:12}}>{pt?<>Aprenda sem<br/><span style={{color:"#facc15"}}>limites.</span></>:<>Aprendé sin<br/><span style={{color:"#facc15"}}>límites.</span></>}</h1>
       </div>
       <div style={{background:"linear-gradient(135deg,#1a1208,#120a1a)",border:"1px solid #facc1544",borderRadius:20,padding:24,marginBottom:24,animation:"proGlow 3s ease infinite"}}>
-        <div style={{fontFamily:'"Plus Jakarta Sans",sans-serif',fontWeight:800,fontSize:40,color:"#facc15",letterSpacing:"-2px",textAlign:"center",lineHeight:1}}>$2<span style={{fontSize:16,color:"#888",fontWeight:300}}>{pt?"/mês":"/mes"}</span></div>
-        <div style={{fontFamily:'"DM Sans",sans-serif',fontSize:12,color:"#888",textAlign:"center",marginTop:4,marginBottom:20}}>{pt?"Menos que um café ☕":"Menos que un tereré 🧉"}</div>
+        <div style={{fontFamily:'"Plus Jakarta Sans",sans-serif',fontWeight:800,fontSize:34,color:"#facc15",letterSpacing:"-1.5px",textAlign:"center",lineHeight:1}}>Gs. {PRO_PRICE_GS}<span style={{fontSize:16,color:"#888",fontWeight:300}}>{pt?"/mês":"/mes"}</span></div>
+        <div style={{fontFamily:'"DM Sans",sans-serif',fontSize:12,color:"#888",textAlign:"center",marginTop:6,marginBottom:20}}>{pt?"≈ US$ 2 · Menos que um café ☕":"≈ US$ 2 · Menos que un tereré 🧉"}</div>
         {feats.map((f,i)=><div key={i} style={{display:"flex",alignItems:"center",gap:12,padding:"10px 0",borderBottom:i<feats.length-1?"1px solid #1a1a1a":"none"}}><span style={{fontFamily:'"DM Sans",sans-serif',fontWeight:400,fontSize:14,color:"#ccc",flex:1}}>{f}</span><span style={{color:"#facc15",fontSize:14}}>✓</span></div>)}
       </div>
-      {!payOpened&&(
-        <button onClick={handlePay} style={{background:"linear-gradient(135deg,#facc15,#f59e0b)",color:"#000",border:"none",borderRadius:16,padding:"18px",fontFamily:'"Plus Jakarta Sans",sans-serif',fontWeight:800,fontSize:16,cursor:"pointer",width:"100%",marginBottom:12,animation:"proGlow 2s ease infinite"}}>
-          {pt?"Assinar Hendy Pro — $2/mês →":"Suscribirse a Hendy Pro — $2/mes →"}
-        </button>
-      )}
-      {payOpened&&!confirming&&(
-        <div style={{marginBottom:12}}>
-          <div style={{fontFamily:'"DM Sans",sans-serif',fontSize:13,color:"#aaa",marginBottom:12,textAlign:"center",lineHeight:1.6}}>
-            {pt?"Complete o pagamento na página que abrimos e volte aqui para confirmar:":"Completá el pago en la página que abrimos y volvé acá para confirmar:"}
-          </div>
-          <button onClick={()=>setConfirming(true)} style={{background:"linear-gradient(135deg,#4ade80,#22c55e)",color:"#000",border:"none",borderRadius:16,padding:"16px",fontFamily:'"Plus Jakarta Sans",sans-serif',fontWeight:800,fontSize:15,cursor:"pointer",width:"100%",marginBottom:10}}>
-            {pt?"✓ Já realizei o pagamento":"✓ Ya realicé el pago"}
-          </button>
-          <button onClick={handlePay} style={{background:"none",border:"1px solid #2a2a2a",borderRadius:14,padding:"12px",fontFamily:'"DM Sans",sans-serif',fontSize:13,color:"#888",cursor:"pointer",width:"100%"}}>
-            {pt?"Abrir página de pagamento novamente":"Abrir página de pago de nuevo"}
-          </button>
-        </div>
-      )}
-      {confirming&&(
-        <div style={{marginBottom:12,textAlign:"center"}}>
-          <div style={{fontSize:48,marginBottom:12}}>⏳</div>
-          <div style={{fontFamily:'"Plus Jakarta Sans",sans-serif',fontWeight:700,fontSize:15,color:"#facc15",marginBottom:8}}>
-            {pt?"Verificando pagamento...":"Verificando pago..."}
-          </div>
-          <div style={{fontFamily:'"DM Sans",sans-serif',fontSize:13,color:"#aaa",marginBottom:16,lineHeight:1.6}}>
-            {pt?"Se o pagamento foi confirmado, clique abaixo para ativar:":"Si el pago fue confirmado, hacé clic abajo para activar:"}
-          </div>
-          <button onClick={onActivate} style={{background:"linear-gradient(135deg,#facc15,#f59e0b)",color:"#000",border:"none",borderRadius:16,padding:"16px",fontFamily:'"Plus Jakarta Sans",sans-serif',fontWeight:800,fontSize:15,cursor:"pointer",width:"100%"}}>
-            {pt?"🔥 Ativar meu Hendy Pro":"🔥 Activar mi Hendy Pro"}
-          </button>
-        </div>
-      )}
+
+      <div style={{fontFamily:'"DM Sans",sans-serif',fontSize:12,color:"#888",marginBottom:8,fontWeight:600,letterSpacing:.5}}>{pt?"1 · PEÇA SEU LINK DE PAGAMENTO":"1 · PEDÍ TU LINK DE PAGO"}</div>
+      <button onClick={openWhatsApp} style={{background:"linear-gradient(135deg,#facc15,#f59e0b)",color:"#000",border:"none",borderRadius:16,padding:"16px",fontFamily:'"Plus Jakarta Sans",sans-serif',fontWeight:800,fontSize:15,cursor:"pointer",width:"100%",marginBottom:22,animation:"proGlow 2s ease infinite"}}>
+        {pt?"💬 Pedir meu Hendy Pro por WhatsApp →":"💬 Pedir mi Hendy Pro por WhatsApp →"}
+      </button>
+
+      <div style={{fontFamily:'"DM Sans",sans-serif',fontSize:12,color:"#888",marginBottom:8,fontWeight:600,letterSpacing:.5}}>{pt?"2 · JÁ PAGOU? DIGITE SEU CÓDIGO":"2 · ¿YA PAGASTE? INGRESÁ TU CÓDIGO"}</div>
+      <input
+        value={code}
+        onChange={e=>{setCode(e.target.value);setErr("");}}
+        onKeyDown={e=>{ if(e.key==="Enter") activate(); }}
+        placeholder="HND-XXXX-XXXX-XXXX-XXXX"
+        autoCapitalize="characters" autoCorrect="off" spellCheck={false}
+        style={{background:"#111",border:"1px solid "+(err?"#f87171":"#2a2a2a"),borderRadius:14,padding:"14px 16px",fontFamily:'"DM Sans",sans-serif',fontSize:15,color:"#fff",outline:"none",width:"100%",boxSizing:"border-box",letterSpacing:1,textTransform:"uppercase"}}
+      />
+      {err&&<div style={{fontFamily:'"DM Sans",sans-serif',fontSize:12,color:"#f87171",marginTop:8,lineHeight:1.5}}>{err}</div>}
+      <button onClick={activate} disabled={!code.trim()||busy} style={{background:(!code.trim()||busy)?"#2a2410":"linear-gradient(135deg,#4ade80,#22c55e)",color:(!code.trim()||busy)?"#6b5f2a":"#000",border:"none",borderRadius:16,padding:"16px",fontFamily:'"Plus Jakarta Sans",sans-serif',fontWeight:800,fontSize:15,cursor:(!code.trim()||busy)?"not-allowed":"pointer",width:"100%",marginTop:12,marginBottom:20}}>
+        {busy?(pt?"Verificando...":"Verificando..."):(pt?"🔥 Ativar meu Hendy Pro":"🔥 Activar mi Hendy Pro")}
+      </button>
+
       <div style={{textAlign:"center",fontFamily:'"DM Sans",sans-serif',fontWeight:300,fontSize:12,color:"#555",lineHeight:1.8}}>
-        {pt?"Cancele quando quiser · Sem compromisso":"Cancelá cuando quieras · Sin compromisos"}<br/>
-        {pt?"Pagamento via MercadoPago 🔒":"Pago via MercadoPago 🔒"}
+        {pt?"Cada pagamento dá 30 dias de Pro · Sem renovação automática":"Cada pago da 30 días de Pro · Sin renovación automática"}<br/>
+        {pt?"Pagamento por link seguro 🔒":"Pago por link seguro 🔒"}
       </div>
     </div>
   );
@@ -1687,7 +1701,7 @@ function Dashboard({userData,streak,completed,onNav,userName,showToast,onGoHome,
   );
 }
 
-function Profile({userData,streak,completed,onReset,userName,notifEnabled,onToggleNotif,isPro,lang}){
+function Profile({userData,streak,completed,onReset,userName,notifEnabled,onToggleNotif,isPro,proUntil,lang}){
   const pt=lang==="pt";
   return(
     <div style={{width:"100%",maxWidth:390,minHeight:"100vh",display:"flex",flexDirection:"column",padding:"56px 28px 100px",animation:"fadeIn .4s ease"}}>
@@ -1697,7 +1711,7 @@ function Profile({userData,streak,completed,onReset,userName,notifEnabled,onTogg
           <div style={{width:56,height:56,borderRadius:16,background:"#1a0d09",border:"2px solid #FF4B2B",display:"flex",alignItems:"center",justifyContent:"center",fontSize:28}}>🔥</div>
           <div>
             <div style={{display:"flex",alignItems:"center",gap:8}}><div style={{fontFamily:'"Plus Jakarta Sans",sans-serif',fontWeight:700,fontSize:18,color:"#fff"}}>{userName||"Usuario"}</div>{isPro&&<div style={{background:"#1a1208",border:"1px solid #facc1544",borderRadius:100,padding:"2px 8px",fontFamily:'"DM Sans",sans-serif',fontSize:10,color:"#facc15",fontWeight:600}}>⭐ PRO</div>}</div>
-            <div style={{fontFamily:'"DM Sans",sans-serif',fontWeight:300,fontSize:13,color:"#aaa",marginTop:3}}>{isPro?(pt?"Plano Pro ativo 🔥":"Plan Pro activo 🔥"):(pt?"No caminho de sair 💪":"En camino de salir 💪")}</div>
+            <div style={{fontFamily:'"DM Sans",sans-serif',fontWeight:300,fontSize:13,color:"#aaa",marginTop:3}}>{isPro?(pt?"Plano Pro ativo até "+fmtFecha(proUntil)+" 🔥":"Plan Pro activo hasta el "+fmtFecha(proUntil)+" 🔥"):(pt?"No caminho de sair 💪":"En camino de salir 💪")}</div>
           </div>
         </div>
         {[{l:pt?"Sequência atual":"Racha actual",v:streak+" "+(pt?"dias 🔥":"días 🔥")},{l:pt?"Lições concluídas":"Lecciones completadas",v:completed.length+" de "+LECCIONES.length},{l:pt?"Pontuação Hendy":"Puntaje Hendy",v:userData&&userData.diagnostico?calcScore(userData.diagnostico.score,completed.length)+"/100":"—"}].map((s,i)=>(
@@ -1774,11 +1788,15 @@ export default function HendyApp(){
   const [userName,setUserName]=useState(sv.userName||"");
   const [userData,setUserData]=useState(sv.userData||null);
   const [streak,setStreak]=useState(sv.streak||0);
-  const [completed,setCompleted]=useState((sv.isPro&&savedMonth!==currentMonth)?[]:(sv.completed||[]));
+  const [completed,setCompleted]=useState(((Number(sv.proUntil)||0)>Date.now()&&savedMonth!==currentMonth)?[]:(sv.completed||[]));
   const [navTab,setNavTab]=useState("dashboard");
   const [notif,setNotif]=useState(sv.notif||false);
-  // Only trust isPro from localStorage if user has real paid data
-  const [isPro,setIsPro]=useState((sv.isPro&&sv.userName)?true:false);
+  // Pro dura 30 días desde que se canjea un código válido (validado en /api/activar).
+  // Se guarda la fecha de vencimiento; pasada esa fecha, Pro se apaga solo.
+  const [proUntil,setProUntil]=useState(()=>{const t=Number(sv.proUntil)||0;return t>Date.now()?t:0;});
+  const [nowTick,setNowTick]=useState(Date.now());
+  useEffect(()=>{const id=setInterval(()=>setNowTick(Date.now()),60000);return()=>clearInterval(id);},[]);
+  const isPro=proUntil>nowTick;
   const [goal,setGoal]=useState(sv.goal||null);
   const [retos,setRetos]=useState(sv.retos||[]);
   const [xp,setXp]=useState(sv.xp||0);
@@ -1791,8 +1809,8 @@ export default function HendyApp(){
   },[]);
 
   useEffect(()=>{
-    try{localStorage.setItem("hendy_v5",JSON.stringify({lang,userName,userData,streak,completed,notif,isPro,goal,retos,xp,misionDone,completedMonth:currentMonth}));}catch(e){}
-  },[lang,userName,userData,streak,completed,notif,isPro,goal,retos,xp,misionDone]);
+    try{localStorage.setItem("hendy_v5",JSON.stringify({lang,userName,userData,streak,completed,notif,proUntil,goal,retos,xp,misionDone,completedMonth:currentMonth}));}catch(e){}
+  },[lang,userName,userData,streak,completed,notif,proUntil,goal,retos,xp,misionDone]);
 
   const showToast=(msg)=>{setToast(msg);setTimeout(()=>setToast(null),3500);};
 
@@ -1831,8 +1849,8 @@ export default function HendyApp(){
       {navTab==="logros"&&<Logros completed={completed} streak={streak} userData={userData} lang={lang}/>}
       {navTab==="retos"&&<RetosScreen retos={retos} setRetos={setRetos} lang={lang} showToast={showToast} onAction={()=>checkMision("retos")} onNav={setNavTab}/>}
       {navTab==="simuladores"&&<SimuladoresScreen lang={lang} onAction={()=>checkMision("simuladores")}/>}
-      {navTab==="profile"&&<Profile userData={userData} streak={streak} completed={completed} userName={userName} notifEnabled={notif} onToggleNotif={toggleNotif} isPro={isPro} lang={lang} onReset={()=>{setUserData(null);setCompleted([]);setStreak(0);setScreen("name");setNavTab("dashboard");setUserName("");setIsPro(false);try{localStorage.removeItem("hendy_v5");}catch(e){}}}/>}
-      {navTab==="pro"&&<ProScreen lang={lang} onActivate={()=>{setIsPro(true);setNavTab("academy");showToast({emoji:"🔥",titulo:lang==="pt"?"Bem-vindo ao Hendy Pro!":"¡Bienvenido a Hendy Pro!",desc:lang==="pt"?"Acesso ilimitado ativado.":"Acceso ilimitado activado."});}} onBack={()=>setNavTab("academy")}/>}
+      {navTab==="profile"&&<Profile userData={userData} streak={streak} completed={completed} userName={userName} notifEnabled={notif} onToggleNotif={toggleNotif} isPro={isPro} proUntil={proUntil} lang={lang} onReset={()=>{setUserData(null);setCompleted([]);setStreak(0);setScreen("name");setNavTab("dashboard");setUserName("");}}/>}
+      {navTab==="pro"&&<ProScreen lang={lang} userName={userName} onActivate={(hasta)=>{const t=Number(hasta);setProUntil(t);setNowTick(Date.now());setNavTab("academy");showToast({emoji:"🔥",titulo:lang==="pt"?"Bem-vindo ao Hendy Pro!":"¡Bienvenido a Hendy Pro!",desc:lang==="pt"?"Ativo até "+fmtFecha(t)+".":"Activo hasta el "+fmtFecha(t)+"."});}} onBack={()=>setNavTab("academy")}/>}
       {navTab==="coach"&&<CoachIA userData={userData} completed={completed} lang={lang} isPro={isPro} onBack={()=>setNavTab("dashboard")} onAction={()=>checkMision("coach")}/>}
       <BottomNav active={navTab} onNav={setNavTab} lang={lang}/>
     </>
@@ -1853,5 +1871,3 @@ export default function HendyApp(){
     </div>
   );
 }
-
-    
