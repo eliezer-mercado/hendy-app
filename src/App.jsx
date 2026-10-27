@@ -336,14 +336,14 @@ function Ambient(){
   );
 }
 
-function Splash({done}){
+function Splash({done,lang}){
   return(
     <div style={{position:"fixed",inset:0,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",zIndex:100,background:"#0A0A0A",animation:done?"slideOut .5s ease forwards":"fadeIn .4s ease"}}>
       <div style={{textAlign:"center"}}>
         <div style={{fontSize:64,animation:"flicker 2s ease infinite",marginBottom:20,lineHeight:1}}>🔥</div>
         <div style={{fontFamily:"\"Plus Jakarta Sans\",sans-serif",fontWeight:800,fontSize:52,color:"#fff",letterSpacing:"-2px",lineHeight:1}}>hendy</div>
         <div style={{height:2,background:"#FF4B2B",borderRadius:2,marginTop:10,animation:"lineGrow 1.5s ease forwards",width:0}}/>
-        <div style={{fontFamily:"\"DM Sans\",sans-serif",fontWeight:300,fontSize:13,color:"#888",marginTop:16,letterSpacing:"3px",textTransform:"uppercase",animation:"fadeIn 1s ease 1s both"}}>Dejá de estarlo.</div>
+        <div style={{fontFamily:"\"DM Sans\",sans-serif",fontWeight:300,fontSize:13,color:"#888",marginTop:16,letterSpacing:"3px",textTransform:"uppercase",animation:"fadeIn 1s ease 1s both"}}>{lang==="pt"?"Saia do aperto.":"Dejá de estarlo."}</div>
       </div>
     </div>
   );
@@ -438,7 +438,7 @@ function Home({onStart,userName,onBack,lang}){
         </div>
       </div>
       <div style={{padding:"24px 28px 0",display:"flex",gap:12,animation:"fadeUp .6s ease .2s both"}}>
-        {[{l:pt?"Usuários":"Usuarios",v:"12K+",s:pt?"↑ crescendo":"↑ creciendo",c:"#FF4B2B"},{l:pt?"Lições":"Lecciones",v:"21",s:pt?"lições":"lecciones",c:"#aaa"},{l:"Países",v:"5",s:"Mercosur",c:"#aaa"}].map((s,i)=>(
+        {[{l:pt?"Usuários":"Usuarios",v:"12K+",s:pt?"↑ crescendo":"↑ creciendo",c:"#FF4B2B"},{l:pt?"Lições":"Lecciones",v:"21",s:pt?"lições":"lecciones",c:"#aaa"},{l:pt?"Países":"Países",v:"5",s:pt?"Mercosul":"Mercosur",c:"#aaa"}].map((s,i)=>(
           <div key={i} className="stat">
             <div style={{fontFamily:"\"DM Sans\",sans-serif",fontSize:11,color:"#888",letterSpacing:"1px",textTransform:"uppercase",marginBottom:6}}>{s.l}</div>
             <div style={{fontFamily:"\"Plus Jakarta Sans\",sans-serif",fontWeight:800,fontSize:22,color:"#fff"}}>{s.v}</div>
@@ -1057,6 +1057,8 @@ const RETO_TEMPLATES = [
   {id:"custom",icon:"✨",es:"Personalizado",pt:"Personalizado",sugES:0,sugPT:0},
 ];
 
+function retoNombre(nombre,pt){ const t=RETO_TEMPLATES.find(x=>x.es===nombre||x.pt===nombre); return t?(pt?t.pt:t.es):nombre; }
+
 function RetosScreen({retos,setRetos,lang,showToast,onAction,onNav}){
   const pt=lang==="pt";
   const [creating,setCreating]=useState(false);
@@ -1090,7 +1092,7 @@ function RetosScreen({retos,setRetos,lang,showToast,onAction,onNav}){
       if(r.id!==retoId)return r;
       const newAhorrado=(r.ahorrado||0)+amt;
       if(newAhorrado>=r.objetivo && (r.ahorrado||0)<r.objetivo){
-        showToast&&showToast({emoji:"🎉",titulo:pt?"Meta alcançada!":"¡Meta alcanzada!",desc:r.nombre});
+        showToast&&showToast({emoji:"🎉",titulo:pt?"Meta alcançada!":"¡Meta alcanzada!",desc:retoNombre(r.nombre,pt)});
       }
       return {...r,ahorrado:newAhorrado};
     }));
@@ -1130,7 +1132,7 @@ function RetosScreen({retos,setRetos,lang,showToast,onAction,onNav}){
                 <span style={{fontSize:24}}>{r.icon}</span>
                 <div>
                   <div style={{fontSize:10,fontFamily:'"DM Sans",sans-serif',color:"#888",letterSpacing:"1px",textTransform:"uppercase"}}>{pt?"Meta:":"Meta:"}</div>
-                  <div style={{fontFamily:'"Plus Jakarta Sans",sans-serif',fontWeight:700,fontSize:14,color:"#fff"}}>{r.nombre}</div>
+                  <div style={{fontFamily:'"Plus Jakarta Sans",sans-serif',fontWeight:700,fontSize:14,color:"#fff"}}>{retoNombre(r.nombre,pt)}</div>
                 </div>
               </div>
               <button onClick={()=>removeReto(r.id)} style={{background:"none",border:"none",color:"#555",cursor:"pointer",fontSize:16,padding:4}}>✕</button>
@@ -1357,9 +1359,9 @@ function SimuladoresScreen({lang,onAction}){
             <div style={{fontFamily:'"DM Sans",sans-serif',fontSize:11,color:"#666",marginBottom:16}}>{pt?`Tipos de câmbio: 1 USD ≈ G ${fmt(tcUsd)} · 1 BRL ≈ G ${fmt(tcBrl)}`:`Tipos de cambio: 1 USD ≈ G ${fmt(tcUsd)} · 1 BRL ≈ G ${fmt(tcBrl)}`}</div>
           )}
           {[
-            {label:"Guaraníes (G)",icon:"🇵🇾",val:fx_gs,from:"gs"},
-            {label:"Reales (BRL)",icon:"🇧🇷",val:fx_brl,from:"brl"},
-            {label:"Dólares (USD)",icon:"🇺🇸",val:fx_usd,from:"usd"},
+            {label:pt?"Guaranis (G)":"Guaraníes (G)",icon:"🇵🇾",val:fx_gs,from:"gs"},
+            {label:pt?"Reais (BRL)":"Reales (BRL)",icon:"🇧🇷",val:fx_brl,from:"brl"},
+            {label:pt?"Dólares (USD)":"Dólares (USD)",icon:"🇺🇸",val:fx_usd,from:"usd"},
           ].map((f,i)=>(
             <div key={i} style={{marginBottom:12}}>
               <div style={{fontFamily:'"DM Sans",sans-serif',fontSize:11,color:"#888",marginBottom:4,display:"flex",alignItems:"center",gap:6}}><span>{f.icon}</span>{f.label}</div>
@@ -1532,7 +1534,7 @@ function SuenoCard({userData,lang,goal,setGoal}){
           <span style={{fontSize:22}}>{def.icon}</span>
           <div>
             <div style={{fontSize:10,fontFamily:'"DM Sans",sans-serif',color:"#888",letterSpacing:"1px",textTransform:"uppercase"}}>{pt?"Meta:":"Meta:"}</div>
-            <div style={{fontFamily:'"Plus Jakarta Sans",sans-serif',fontWeight:700,fontSize:15,color:"#fff"}}>{goal.nombre}</div>
+            <div style={{fontFamily:'"Plus Jakarta Sans",sans-serif',fontWeight:700,fontSize:15,color:"#fff"}}>{(goal.nombre===def.es||goal.nombre===def.pt)?(pt?def.pt:def.es):goal.nombre}</div>
           </div>
         </div>
         <button onClick={()=>setEditing(true)} style={{background:"none",border:"none",color:"#666",cursor:"pointer",fontSize:14,padding:4}}>✎</button>
@@ -1710,7 +1712,7 @@ function Profile({userData,streak,completed,onReset,userName,notifEnabled,onTogg
         <div style={{display:"flex",alignItems:"center",gap:16,marginBottom:20}}>
           <div style={{width:56,height:56,borderRadius:16,background:"#1a0d09",border:"2px solid #FF4B2B",display:"flex",alignItems:"center",justifyContent:"center",fontSize:28}}>🔥</div>
           <div>
-            <div style={{display:"flex",alignItems:"center",gap:8}}><div style={{fontFamily:'"Plus Jakarta Sans",sans-serif',fontWeight:700,fontSize:18,color:"#fff"}}>{userName||"Usuario"}</div>{isPro&&<div style={{background:"#1a1208",border:"1px solid #facc1544",borderRadius:100,padding:"2px 8px",fontFamily:'"DM Sans",sans-serif',fontSize:10,color:"#facc15",fontWeight:600}}>⭐ PRO</div>}</div>
+            <div style={{display:"flex",alignItems:"center",gap:8}}><div style={{fontFamily:'"Plus Jakarta Sans",sans-serif',fontWeight:700,fontSize:18,color:"#fff"}}>{userName||(pt?"Usuário":"Usuario")}</div>{isPro&&<div style={{background:"#1a1208",border:"1px solid #facc1544",borderRadius:100,padding:"2px 8px",fontFamily:'"DM Sans",sans-serif',fontSize:10,color:"#facc15",fontWeight:600}}>⭐ PRO</div>}</div>
             <div style={{fontFamily:'"DM Sans",sans-serif',fontWeight:300,fontSize:13,color:"#aaa",marginTop:3}}>{isPro?(pt?"Plano Pro ativo até "+fmtFecha(proUntil)+" 🔥":"Plan Pro activo hasta el "+fmtFecha(proUntil)+" 🔥"):(pt?"No caminho de sair 💪":"En camino de salir 💪")}</div>
           </div>
         </div>
@@ -1787,6 +1789,8 @@ export default function HendyApp(){
   const [splashDone,setSplash]=useState(false);
   const [userName,setUserName]=useState(sv.userName||"");
   const [userData,setUserData]=useState(sv.userData||null);
+  // El diagnóstico se vuelve a calcular con el idioma actual (así, si cambiás ES/PT, el texto sigue el idioma).
+  const userDataV=userData?{...userData,diagnostico:(userData.answers?getDiag(userData.answers,lang):userData.diagnostico)}:null;
   const [streak,setStreak]=useState(sv.streak||0);
   const [completed,setCompleted]=useState(((Number(sv.proUntil)||0)>Date.now()&&savedMonth!==currentMonth)?[]:(sv.completed||[]));
   const [navTab,setNavTab]=useState("dashboard");
@@ -1844,14 +1848,14 @@ export default function HendyApp(){
 
   const renderApp=()=>(
     <>
-      {navTab==="dashboard"&&<Dashboard userData={userData} streak={streak} completed={completed} onNav={setNavTab} userName={userName} showToast={showToast} onGoHome={()=>setScreen("home")} lang={lang} goal={goal} setGoal={setGoal} xp={xp} setXp={setXp} misionDone={misionDone} setMisionDone={setMisionDone}/>}
-      {navTab==="academy"&&<Academy userData={userData} streak={streak} completed={completed} onComplete={completeLesson} isPro={isPro} onUpgrade={()=>setNavTab("pro")} lang={lang}/>}
-      {navTab==="logros"&&<Logros completed={completed} streak={streak} userData={userData} lang={lang}/>}
+      {navTab==="dashboard"&&<Dashboard userData={userDataV} streak={streak} completed={completed} onNav={setNavTab} userName={userName} showToast={showToast} onGoHome={()=>setScreen("home")} lang={lang} goal={goal} setGoal={setGoal} xp={xp} setXp={setXp} misionDone={misionDone} setMisionDone={setMisionDone}/>}
+      {navTab==="academy"&&<Academy userData={userDataV} streak={streak} completed={completed} onComplete={completeLesson} isPro={isPro} onUpgrade={()=>setNavTab("pro")} lang={lang}/>}
+      {navTab==="logros"&&<Logros completed={completed} streak={streak} userData={userDataV} lang={lang}/>}
       {navTab==="retos"&&<RetosScreen retos={retos} setRetos={setRetos} lang={lang} showToast={showToast} onAction={()=>checkMision("retos")} onNav={setNavTab}/>}
       {navTab==="simuladores"&&<SimuladoresScreen lang={lang} onAction={()=>checkMision("simuladores")}/>}
-      {navTab==="profile"&&<Profile userData={userData} streak={streak} completed={completed} userName={userName} notifEnabled={notif} onToggleNotif={toggleNotif} isPro={isPro} proUntil={proUntil} lang={lang} onReset={()=>{setUserData(null);setCompleted([]);setStreak(0);setScreen("name");setNavTab("dashboard");setUserName("");}}/>}
+      {navTab==="profile"&&<Profile userData={userDataV} streak={streak} completed={completed} userName={userName} notifEnabled={notif} onToggleNotif={toggleNotif} isPro={isPro} proUntil={proUntil} lang={lang} onReset={()=>{setUserData(null);setCompleted([]);setStreak(0);setScreen("name");setNavTab("dashboard");setUserName("");}}/>}
       {navTab==="pro"&&<ProScreen lang={lang} userName={userName} onActivate={(hasta)=>{const t=Number(hasta);setProUntil(t);setNowTick(Date.now());setNavTab("academy");showToast({emoji:"🔥",titulo:lang==="pt"?"Bem-vindo ao Hendy Pro!":"¡Bienvenido a Hendy Pro!",desc:lang==="pt"?"Ativo até "+fmtFecha(t)+".":"Activo hasta el "+fmtFecha(t)+"."});}} onBack={()=>setNavTab("academy")}/>}
-      {navTab==="coach"&&<CoachIA userData={userData} completed={completed} lang={lang} isPro={isPro} onBack={()=>setNavTab("dashboard")} onAction={()=>checkMision("coach")}/>}
+      {navTab==="coach"&&<CoachIA userData={userDataV} completed={completed} lang={lang} isPro={isPro} onBack={()=>setNavTab("dashboard")} onAction={()=>checkMision("coach")}/>}
       <BottomNav active={navTab} onNav={setNavTab} lang={lang}/>
     </>
   );
@@ -1861,12 +1865,12 @@ export default function HendyApp(){
       <style>{CSS}</style>
       <Ambient/>
       {toast&&<ToastBox msg={toast}/>}
-      {screen==="splash"&&<Splash done={splashDone}/>}
+      {screen==="splash"&&<Splash done={splashDone} lang={lang}/>}
       {screen==="name"&&<NameScreen onContinue={n=>{setUserName(n);setScreen("home");}} lang={lang} setLang={setLang} savedName={userName||""} onContinueSaved={userName?()=>setScreen("app"):null}/>}
       {screen==="home"&&<Home onStart={()=>setScreen("quiz")} userName={userName} onBack={()=>setScreen("name")} lang={lang}/>}
       {screen==="quiz"&&<Quiz onFinish={a=>{setScreen("loading");setTimeout(()=>{const d=getDiag(a,lang);setUserData({answers:a,diagnostico:d});setScreen("result");},2200);}} onBack={()=>setScreen("home")} lang={lang}/>}
       {screen==="loading"&&<Loading lang={lang}/>}
-      {screen==="result"&&userData&&<Result data={userData.diagnostico} onContinue={()=>{setScreen("app");setNavTab("dashboard");}} onBack={()=>setScreen("quiz")} lang={lang}/>}
+      {screen==="result"&&userData&&<Result data={userDataV.diagnostico} onContinue={()=>{setScreen("app");setNavTab("dashboard");}} onBack={()=>setScreen("quiz")} lang={lang}/>}
       {screen==="app"&&renderApp()}
     </div>
   );
