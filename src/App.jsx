@@ -1068,7 +1068,7 @@ function RetosScreen({retos,setRetos,lang,showToast,onAction,onNav}){
   const [addingTo,setAddingTo]=useState(null);
   const [addAmount,setAddAmount]=useState("");
 
-  const fmt=(n)=>"G "+Number(n||0).toLocaleString("es-PY");
+  const fmt=(n)=>(pt?"R$ ":"G ")+Number(n||0).toLocaleString(pt?"pt-BR":"es-PY");
 
   const pickTemplate=(tpl)=>{
     setPickedTpl(tpl);
@@ -1507,7 +1507,7 @@ function SuenoCard({userData,lang,goal,setGoal}){
     setAddOpen(false);
   };
 
-  const fmt=(n)=>"G "+Number(n||0).toLocaleString("es-PY");
+  const fmt=(n)=>(pt?"R$ ":"G ")+Number(n||0).toLocaleString(pt?"pt-BR":"es-PY");
 
   if(!goal||editing){
     return(
