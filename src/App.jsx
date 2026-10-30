@@ -1672,7 +1672,7 @@ function Dashboard({userData,streak,completed,onNav,userName,showToast,onGoHome,
   );
 }
 
-function Profile({userData,streak,completed,onReset,userName,notifEnabled,onToggleNotif,isPro,proUntil,lang}){
+function Profile({userData,streak,completed,onReset,userName,notifEnabled,onToggleNotif,isPro,proUntil,lang,onNav}){
   const pt=lang==="pt";
   return(
     <div style={{width:"100%",maxWidth:390,minHeight:"100vh",display:"flex",flexDirection:"column",padding:"56px 28px 100px",animation:"fadeIn .4s ease"}}>
@@ -1706,7 +1706,8 @@ function Profile({userData,streak,completed,onReset,userName,notifEnabled,onTogg
         </div>
       )}
       <button onClick={onReset} className="btng" style={{marginTop:0}}>{pt?"🔄 Refazer diagnóstico":"🔄 Repetir diagnóstico"}</button>
-      <div style={{textAlign:"center",marginTop:24,fontFamily:'"DM Sans",sans-serif',fontWeight:300,fontSize:12,color:"#333"}}>{pt?"hendy · Mercosul 🔥 v1.0":"hendy · Paraguay 🔥 v1.0"}</div>
+      <button onClick={()=>onNav&&onNav("about")} style={{background:"none",border:"none",fontFamily:'"DM Sans",sans-serif',fontSize:13,color:"#888",cursor:"pointer",marginTop:20,textAlign:"center",textDecoration:"underline"}}>{pt?"Quem está por trás da Hendy":"Quién está detrás de Hendy"}
+      </button><div style={{textAlign:"center",marginTop:24,fontFamily:'"DM Sans",sans-serif',fontWeight:300,fontSize:12,color:"#333"}}>{pt?"hendy · Mercosul 🔥 v1.0":"hendy · Paraguay 🔥 v1.0"}</div>
     </div>
   );
 }
