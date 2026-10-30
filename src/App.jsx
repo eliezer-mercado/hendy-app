@@ -1711,7 +1711,41 @@ function Profile({userData,streak,completed,onReset,userName,notifEnabled,onTogg
     </div>
   );
 }
-
+function AboutScreen({lang,onBack}){
+  const pt=lang==="pt";
+  return(
+    <div style={{width:"100%",maxWidth:390,minHeight:"100vh",display:"flex",flexDirection:"column",padding:"56px 28px 100px",animation:"fadeIn .4s ease"}}>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:24}}>
+        <div style={{fontFamily:'"Plus Jakarta Sans",sans-serif',fontWeight:800,fontSize:24,color:"#fff",letterSpacing:"-1px"}}>{pt?"Quem está por trás":"Quién está detrás"}</div>
+        <button onClick={onBack} style={{background:"#161616",border:"1px solid #2a2a2a",borderRadius:12,color:"#ccc",cursor:"pointer",fontFamily:'"DM Sans",sans-serif',fontSize:12,fontWeight:500,padding:"8px 12px",display:"flex",alignItems:"center",gap:4,flexShrink:0}}>{pt?"← Voltar":"← Volver"}</button>
+      </div>
+      <div className="card" style={{marginBottom:14}}>
+        <div style={{fontSize:11,fontFamily:'"DM Sans",sans-serif',color:"#888",letterSpacing:"1.5px",textTransform:"uppercase",marginBottom:10}}>{pt?"Quem opera a Hendy":"Quién opera Hendy"}</div>
+        <p style={{fontFamily:'"DM Sans",sans-serif',fontWeight:300,fontSize:14,color:"#ccc",lineHeight:1.7,marginBottom:12}}>{pt?"Hendy é um projeto independente, operado por Eliezer Mercado como empresa individual (RUC 2403667-6).":"Hendy es un proyecto independiente, operado por Eliezer Mercado como empresa unipersonal (RUC 2403667-6)."}</p>
+        <p style={{fontFamily:'"DM Sans",sans-serif',fontWeight:300,fontSize:14,color:"#ccc",lineHeight:1.7}}>{pt?"Eliezer também é Diretor Estratégico na NXB Fintech, mas Hendy não é um produto da NXB: é um projeto separado. Hendy não vende nem recomenda nenhum produto financeiro específico.":"Eliezer también es Director Estratégico en NXB Fintech, pero Hendy no es un producto de NXB: es un proyecto separado. Hendy no vende ni recomienda ningún producto financiero específico."}</p>
+      </div>
+      <div className="card" style={{marginBottom:14}}>
+        <div style={{fontSize:11,fontFamily:'"DM Sans",sans-serif',color:"#888",letterSpacing:"1.5px",textTransform:"uppercase",marginBottom:10}}>{pt?"Seus dados":"Tus datos"}</div>
+        <p style={{fontFamily:'"DM Sans",sans-serif',fontWeight:300,fontSize:14,color:"#ccc",lineHeight:1.7}}>{pt?"Pedimos dados sobre sua renda, gastos, dívidas e objetivos para montar seu diagnóstico e suas lições. Não vendemos esses dados para ninguém. Você pode pedir para apagá-los quando quiser.":"Te pedimos datos sobre tus ingresos, gastos, deudas y objetivos para armar tu diagnóstico y tus lecciones. No vendemos esos datos a nadie. Podés pedir que los borremos cuando quieras."}</p>
+      </div>
+      <div className="card" style={{marginBottom:14}}>
+        <div style={{fontSize:11,fontFamily:'"DM Sans",sans-serif',color:"#888",letterSpacing:"1.5px",textTransform:"uppercase",marginBottom:10}}>{pt?"Regras simples":"Reglas simples"}</div>
+        <p style={{fontFamily:'"DM Sans",sans-serif',fontWeight:300,fontSize:14,color:"#ccc",lineHeight:1.7}}>{pt?"Hendy é grátis por enquanto. Se no futuro cobrarmos algo, vamos avisar com clareza, sem letra miúda. Não compartilhamos suas informações com bancos, cooperativas ou qualquer outra empresa sem que você decida isso.":"Hendy es gratis por ahora. Si en el futuro cobramos algo, te lo vamos a decir con claridad, sin letra chica. No compartimos tu información con bancos, cooperativas ni ninguna otra empresa sin que vos lo decidas."}</p>
+      </div>
+      <div className="card">
+        <div style={{fontSize:11,fontFamily:'"DM Sans",sans-serif',color:"#888",letterSpacing:"1.5px",textTransform:"uppercase",marginBottom:12}}>{pt?"Contato":"Contacto"}</div>
+        <a href="mailto:contacto@hendy.lat" style={{display:"flex",alignItems:"center",gap:10,textDecoration:"none",padding:"10px 0",borderBottom:"1px solid #161616"}}>
+          <span style={{fontSize:18}}>✉️</span>
+          <span style={{fontFamily:'"DM Sans",sans-serif',fontWeight:500,fontSize:14,color:"#fff"}}>contacto@hendy.lat</span>
+        </a>
+        <a href="https://wa.me/595971653879" target="_blank" rel="noreferrer" style={{display:"flex",alignItems:"center",gap:10,textDecoration:"none",padding:"10px 0"}}>
+          <span style={{fontSize:18}}>💬</span>
+          <span style={{fontFamily:'"DM Sans",sans-serif',fontWeight:500,fontSize:14,color:"#fff"}}>WhatsApp</span>
+        </a>
+      </div>
+    </div>
+  );
+}
 function BottomNav({active,onNav,lang}){
   const pt=lang==="pt";
   const leftItems=[{id:"academy",icon:"📚",label:"Academia"},{id:"retos",icon:"🎯",label:pt?"Desafios":"Retos"}];
@@ -1823,7 +1857,8 @@ export default function HendyApp(){
       {navTab==="logros"&&<Logros completed={completed} streak={streak} userData={userDataV} lang={lang}/>}
       {navTab==="retos"&&<RetosScreen retos={retos} setRetos={setRetos} lang={lang} showToast={showToast} onAction={()=>checkMision("retos")} onNav={setNavTab}/>}
       {navTab==="simuladores"&&<SimuladoresScreen lang={lang} onAction={()=>checkMision("simuladores")}/>}
-      {navTab==="profile"&&<Profile userData={userDataV} streak={streak} completed={completed} userName={userName} notifEnabled={notif} onToggleNotif={toggleNotif} isPro={isPro} proUntil={proUntil} lang={lang} onReset={()=>{setUserData(null);setCompleted([]);setStreak(0);setScreen("name");setNavTab("dashboard");setUserName("");}}/>}
+            {navTab==="profile"&&<Profile userData={userDataV} streak={streak} completed={completed} userName={userName} notifEnabled={notif} onToggleNotif={toggleNotif} isPro={isPro} proUntil={proUntil} lang={lang} onNav={setNavTab} onReset={()=>{setUserData(null);setCompleted([]);setStreak(0);setScreen("name");setNavTab("dashboard");setUserName("");}}/>}       
+      {navTab==="about"&&<AboutScreen lang={lang} onBack={()=>setNavTab("profile")}/>} userData={userDataV} streak={streak} completed={completed} userName={userName} notifEnabled={notif} onToggleNotif={toggleNotif} isPro={isPro} proUntil={proUntil} lang={lang} onReset={()=>{setUserData(null);setCompleted([]);setStreak(0);setScreen("name");setNavTab("dashboard");setUserName("");}}/>}
       {navTab==="pro"&&<ProScreen lang={lang} userName={userName} onActivate={(hasta)=>{const t=Number(hasta);setProUntil(t);setNowTick(Date.now());setNavTab("academy");showToast({emoji:"🔥",titulo:lang==="pt"?"Bem-vindo ao Hendy Pro!":"¡Bienvenido a Hendy Pro!",desc:lang==="pt"?"Ativo até "+fmtFecha(t)+".":"Activo hasta el "+fmtFecha(t)+"."});}} onBack={()=>setNavTab("academy")}/>}
       {navTab==="coach"&&<CoachIA userData={userDataV} completed={completed} lang={lang} isPro={isPro} onBack={()=>setNavTab("dashboard")} onAction={()=>checkMision("coach")}/>}
       <BottomNav active={navTab} onNav={setNavTab} lang={lang}/>
