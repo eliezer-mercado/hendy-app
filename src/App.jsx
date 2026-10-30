@@ -438,7 +438,7 @@ function Home({onStart,userName,onBack,lang}){
         </div>
       </div>
       <div style={{padding:"24px 28px 0",display:"flex",gap:12,animation:"fadeUp .6s ease .2s both"}}>
-        {[{l:pt?"Usuários":"Usuarios",v:"12K+",s:pt?"↑ crescendo":"↑ creciendo",c:"#FF4B2B"},{l:pt?"Lições":"Lecciones",v:"21",s:pt?"lições":"lecciones",c:"#aaa"},{l:pt?"Países":"Países",v:"5",s:pt?"Mercosul":"Mercosur",c:"#aaa"}].map((s,i)=>(
+        {[{l:pt?"Comunidade":"Comunidad",v:"Beta",s:pt?"construindo juntos":"construyendo juntos",c:"#FF4B2B"},{l:pt?"Lições":"Lecciones",v:"21",s:pt?"lições":"lecciones",c:"#aaa"},{l:pt?"Países":"Países",v:"5",s:pt?"Mercosul":"Mercosur",c:"#aaa"}].map((s,i)=>(
           <div key={i} className="stat">
             <div style={{fontFamily:"\"DM Sans\",sans-serif",fontSize:11,color:"#888",letterSpacing:"1px",textTransform:"uppercase",marginBottom:6}}>{s.l}</div>
             <div style={{fontFamily:"\"Plus Jakarta Sans\",sans-serif",fontWeight:800,fontSize:22,color:"#fff"}}>{s.v}</div>
