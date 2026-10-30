@@ -412,8 +412,8 @@ function NameScreen({onContinue,lang,setLang,savedName,onContinueSaved}){
 function Home({onStart,userName,onBack,lang}){
   const pt=lang==="pt";
   const feats=pt
-    ?[{i:"🧠",bg:"#1a1208",l:"Diagnóstico personalizado",d:"3 perguntas. Seu mapa financeiro real."},{i:"📅",bg:"#0d1a0d",l:"Micro-lições diárias",d:"60 segundos. Linguagem da rua, não do banco."},{i:"🏆",bg:"#1a1208",l:"Conquistas e badges",d:"Ganhe medalhas pelo seu progresso."},{i:"💸",bg:"#1a0d0d",l:"Conectado ao NXB",d:"Mova seu dinheiro sem taxas abusivas."}]
-    :[{i:"🧠",bg:"#1a1208",l:"Diagnóstico personalizado",d:"3 preguntas. Tu mapa financiero real."},{i:"📅",bg:"#0d1a0d",l:"Micro-lecciones diarias",d:"60 segundos. Lenguaje de la feria, no del banco."},{i:"🏆",bg:"#1a1208",l:"Logros y badges",d:"Ganá medallas por tu progreso y tu racha."},{i:"💸",bg:"#1a0d0d",l:"Conectado a NXB",d:"Mové tu plata sin comisiones abusivas."}];
+    ?[{i:"🧠",bg:"#1a1208",l:"Diagnóstico personalizado",d:"3 perguntas. Seu mapa financeiro real."},{i:"📅",bg:"#0d1a0d",l:"Micro-lições diárias",d:"60 segundos. Linguagem da rua, não do banco."},{i:"🏆",bg:"#1a1208",l:"Conquistas e badges",d:"Ganhe medalhas pelo seu progresso."},];
+    :[{i:"🧠",bg:"#1a1208",l:"Diagnóstico personalizado",d:"3 preguntas. Tu mapa financiero real."},{i:"📅",bg:"#0d1a0d",l:"Micro-lecciones diarias",d:"60 segundos. Lenguaje de la feria, no del banco."},{i:"🏆",bg:"#1a1208",l:"Logros y badges",d:"Ganá medallas por tu progreso y tu racha."},];
   return(
     <div style={{width:"100%",maxWidth:390,minHeight:"100vh",display:"flex",flexDirection:"column",padding:"0 0 100px",animation:"fadeIn .6s ease"}}>
       <div style={{padding:"56px 28px 0",display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
