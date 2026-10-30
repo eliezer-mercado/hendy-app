@@ -1667,38 +1667,7 @@ function Dashboard({userData,streak,completed,onNav,userName,showToast,onGoHome,
           {!misionHecha&&<div style={{background:"#FF4B2B",borderRadius:8,padding:"4px 10px",fontFamily:'"DM Sans",sans-serif',fontSize:11,fontWeight:600,color:"#fff",flexShrink:0}}>{mision.action?(pt?"Ir →":"Ir →"):(pt?"Marcar feita":"Marcar lista")}</div>}
         </div>
       </div>
-      <div style={{background:"linear-gradient(135deg,#1a0a08,#0d0d1a)",border:"1px solid #2a1520",borderRadius:20,padding:20,animation:"fadeUp .5s ease .4s both"}}>
-        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:10}}>
-          <div style={{display:"flex",alignItems:"center",gap:10}}><span style={{fontSize:20}}>💸</span><div style={{fontFamily:'"Plus Jakarta Sans",sans-serif',fontWeight:700,fontSize:14,color:"#ddd"}}>{pt?"NXB · Pagamentos internacionais":"NXB · Pagos internacionales"}</div></div>
-          <div style={{background:"#1a1208",border:"1px solid #facc1533",borderRadius:100,padding:"4px 10px",fontFamily:'"DM Sans",sans-serif',fontSize:10,color:"#facc15",textTransform:"uppercase",flexShrink:0}}>{pt?"🚧 Em desenvolvimento":"🚧 En desarrollo"}</div>
-        </div>
-        <p style={{fontFamily:'"DM Sans",sans-serif',fontWeight:300,fontSize:13,color:"#aaa",lineHeight:1.6,marginBottom:14}}>{pt?"Em breve você poderá mover seu dinheiro sem taxas abusivas em todo o Mercosul.":"Muy pronto podrás mover tu plata sin comisiones abusivas en todo el Mercosur."}</p>
-        {waitDone?(
-          <div style={{display:"flex",alignItems:"center",gap:12,padding:"14px 20px",background:"#0a130a",border:"1px solid #4ade8033",borderRadius:16,animation:"fadeIn .4s ease"}}>
-            <span style={{fontSize:24}}>✅</span>
-            <div>
-              <div style={{fontFamily:'"Plus Jakarta Sans",sans-serif',fontWeight:700,fontSize:14,color:"#4ade80"}}>{pt?"Cadastrado!":"¡Anotado!"}</div>
-              <div style={{fontFamily:'"DM Sans",sans-serif',fontWeight:300,fontSize:12,color:"#aaa",marginTop:2}}>{pt?"Avisamos quando o NXB estiver pronto 🔥":"Te avisamos cuando NXB esté listo 🔥"}</div>
-            </div>
-          </div>
-        ):formOpened?(
-          <div>
-            <div style={{fontFamily:'"DM Sans",sans-serif',fontSize:12,color:"#aaa",marginBottom:10,lineHeight:1.5}}>
-              {pt?"Complete o formulário que abrimos e volte aqui para confirmar:":"Completá el formulario que abrimos y volvé acá para confirmar:"}
-            </div>
-            <button onClick={handleConfirm} className="btn" style={{animation:"none",padding:"13px 20px",fontSize:13,background:"#0a130a",color:"#4ade80",border:"1px solid #4ade8033"}}>
-              {pt?"✓ Já preenchi o formulário":"✓ Ya completé el formulario"}
-            </button>
-            <button onClick={handleWait} style={{background:"none",border:"none",fontFamily:'"DM Sans",sans-serif',fontSize:12,color:"#666",cursor:"pointer",marginTop:8,width:"100%",textAlign:"center"}}>
-              {pt?"Abrir formulário novamente":"Abrir formulario de nuevo"}
-            </button>
-          </div>
-        ):(
-          <button onClick={handleWait} className="btn" style={{animation:"none",padding:"13px 20px",fontSize:13,background:"#1a1208",color:"#facc15",border:"1px solid #facc1533"}}>
-            {pt?"Quero acesso antecipado ao NXB →":"Anotarme en la lista de espera →"}
-          </button>
-        )}
-      </div>
+      
     </div>
   );
 }
