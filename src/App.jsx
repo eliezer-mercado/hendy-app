@@ -433,7 +433,7 @@ function Home({onStart,userName,onBack,lang}){
           <span style={{fontSize:20,flexShrink:0}}>🔥</span>
           <div>
             <div style={{fontFamily:"\"Plus Jakarta Sans\",sans-serif",fontWeight:700,fontSize:13,color:"#FF4B2B",marginBottom:4}}>{pt?"O que significa Hendy?":"¿Qué significa Hendy?"}</div>
-            <p style={{fontFamily:"\"DM Sans\",sans-serif",fontWeight:300,fontSize:13,color:"#aaa",lineHeight:1.6}}>{pt?"Hendy é uma palavra do guarani — língua nativa do Paraguai — que significa "está pegando fogo". É usada para descrever uma situação apertada, sobretudo o aperto de dinheiro no fim do mês. Aqui é o ponto de partida.":"Hendy es una palabra guaraní — el idioma nativo de Paraguay — que significa "se enciende". Se usa para describir una situación que está que arde, sobre todo el apuro de plata a fin de mes. Acá es el punto de partida."}</p>
+            <p style={{fontFamily:"\"DM Sans\",sans-serif",fontWeight:300,fontSize:13,color:"#aaa",lineHeight:1.6}}>{pt?"Hendy é uma palavra do guarani — língua nativa do Paraguai — que significa “está pegando fogo”. É usada para descrever uma situação apertada, sobretudo o aperto de dinheiro no fim do mês. Aqui é o ponto de partida.":"Hendy es una palabra guaraní — el idioma nativo de Paraguay — que significa “se enciende”. Se usa para describir una situación que está que arde, sobre todo el apuro de plata a fin de mes. Acá es el punto de partida."}</p>
           </div>
         </div>
       </div>
