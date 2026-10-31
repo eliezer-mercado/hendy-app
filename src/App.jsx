@@ -967,7 +967,7 @@ function Academy({userData,streak,completed,onComplete,isPro,onUpgrade,lang}){
             pt?"🔄 Lições renovadas no 1° de cada mês":"🔄 Lecciones renovadas el 1° de cada mes",
             pt?"🤖 +1 lição IA exclusiva ao concluir as 21":"🤖 +1 lección IA exclusiva al completar las 21",
             pt?`💬 Coach IA: ${PRO_COACH_LIMIT} perguntas por mês`:`💬 Coach IA: ${PRO_COACH_LIMIT} preguntas por mes`,
-            pt?`💰 Gs. ${PRO_PRICE_GS}/mês · Sem renovação automática`:`💰 Gs. ${PRO_PRICE_GS}/mes (· Sin renovación automática`
+            pt?`💰 Gs. ${PRO_PRICE_GS}/mês · Sem renovação automática`:`💰 Gs. ${PRO_PRICE_GS}/mes · Sin renovación automática`
           ].map((item,i)=>(
             <div key={i} style={{fontFamily:'"DM Sans",sans-serif',fontSize:13,color:"#ccc",display:"flex",alignItems:"center",gap:8}}>{item}</div>
           ))}
@@ -1017,7 +1017,7 @@ function ProScreen({onActivate,onBack,lang,userName}){
       </div>
       <div style={{background:"linear-gradient(135deg,#1a1208,#120a1a)",border:"1px solid #facc1544",borderRadius:20,padding:24,marginBottom:24,animation:"proGlow 3s ease infinite"}}>
         <div style={{fontFamily:'"Plus Jakarta Sans",sans-serif',fontWeight:800,fontSize:34,color:"#facc15",letterSpacing:"-1.5px",textAlign:"center",lineHeight:1}}>Gs. {PRO_PRICE_GS}<span style={{fontSize:16,color:"#888",fontWeight:300}}>{pt?"/mês":"/mes"}</span></div>
-        <div style={{fontFamily:'"DM Sans",sans-serif',fontSize:12,color:"#888",textAlign:"center",marginTop:6,marginBottom:20}}>{pt?"Menos que um café ☕":"≈ Menos que un tereré 🧉"}</div>
+        <div style={{fontFamily:'"DM Sans",sans-serif',fontSize:12,color:"#888",textAlign:"center",marginTop:6,marginBottom:20}}>{pt?"Menos que um café ☕":"Menos que un tereré 🧉"}</div>
         {feats.map((f,i)=><div key={i} style={{display:"flex",alignItems:"center",gap:12,padding:"10px 0",borderBottom:i<feats.length-1?"1px solid #1a1a1a":"none"}}><span style={{fontFamily:'"DM Sans",sans-serif',fontWeight:400,fontSize:14,color:"#ccc",flex:1}}>{f}</span><span style={{color:"#facc15",fontSize:14}}>✓</span></div>)}
       </div>
 
