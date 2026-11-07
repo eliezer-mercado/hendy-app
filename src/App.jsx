@@ -1831,7 +1831,7 @@ export default function HendyApp(){
 
   useEffect(()=>{
       try{localStorage.setItem("hendy_v5",JSON.stringify({lang,userName,userData,streak,completed,notif,proUntil,goal,retos,xp,misionDone,gastos,completedMonth:currentMonth}));}catch(e){}
-  },[lang,userName,userData,streak,completed,notif,proUntil,goal,retos,xp,misionDone]);
+  },[lang,userName,userData,streak,completed,notif,proUntil,goal,retos,xp,misionDone,gastos]);
 
   const showToast=(msg)=>{setToast(msg);setTimeout(()=>setToast(null),3500);};
 
