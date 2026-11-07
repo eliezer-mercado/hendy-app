@@ -1422,7 +1422,7 @@ function getProxNivel(score){
 
 // ── Misiones diarias ──────────────────────────────────────────────────────────
 const MISIONES_ES = [
-  {id:"m1", emoji:"📝", texto:"Anotá un gasto que hiciste hoy", xp:20, action:null},
+  {id:"m1", emoji:"📝", texto:"Anotá un gasto que hiciste hoy", xp:20, action:"gasto"},
   {id:"m2", emoji:"🎯", texto:"Revisá el progreso de tu meta financiera", xp:15, action:null},
   {id:"m3", emoji:"📚", texto:"Completá una lección de la Academia", xp:30, action:"academy"},
   {id:"m4", emoji:"💬", texto:"Hacele una pregunta al Coach Hendy", xp:25, action:"coach"},
@@ -1431,7 +1431,7 @@ const MISIONES_ES = [
   {id:"m7", emoji:"🔥", texto:"Revisá tu Hendy Score y tus categorías", xp:10, action:null},
 ];
 const MISIONES_PT = [
-  {id:"m1", emoji:"📝", texto:"Anota um gasto que você fez hoje", xp:20, action:null},
+  {id:"m1", emoji:"📝", texto:"Anota um gasto que você fez hoje", xp:20, action:"gasto"},
   {id:"m2", emoji:"🎯", texto:"Verifique o progresso da sua meta financeira", xp:15, action:null},
   {id:"m3", emoji:"📚", texto:"Conclua uma lição da Academia", xp:30, action:"academy"},
   {id:"m4", emoji:"💬", texto:"Faça uma pergunta ao Coach Hendy", xp:25, action:"coach"},
@@ -1554,9 +1554,9 @@ function SuenoCard({userData,lang,goal,setGoal}){
   );
 }
 
-function Dashboard({userData,streak,completed,onNav,userName,showToast,onGoHome,lang,goal,setGoal,xp,setXp,misionDone,setMisionDone}){
+function Dashboard({userData,streak,completed,onNav,userName,showToast,onGoHome,lang,goal,setGoal,xp,setXp,misionDone,setMisionDone,gastos,setGastos}){
   const pt=lang==="pt";
-  const [waitDone,setWaitDone]=useState(false);
+  const [waitDone,setWaitDone]=useState(false);const [gastoOpen,setGastoOpen]=useState(false);const [gastoMonto,setGastoMonto]=useState("");
   const diagScore=userData&&userData.diagnostico?userData.diagnostico.score:0;
   const score=calcScore(diagScore,completed.length);
   const breakdown=calcBreakdown(userData,completed.length,goal);
@@ -1657,16 +1657,29 @@ function Dashboard({userData,streak,completed,onNav,userName,showToast,onGoHome,
           </div>
         </div>
       )}
+            {gastoOpen&&!misionHecha?(
+        <div style={{background:"#111",border:"1px solid #2a2a2a",borderRadius:18,padding:"16px 18px",marginBottom:14,animation:"fadeUp .5s ease .35s both"}}>
+          <div style={{fontFamily:'"DM Sans",sans-serif',fontSize:10,color:"#FF4B2B",letterSpacing:"1.5px",textTransform:"uppercase",marginBottom:10}}>{pt?"Missão do dia":"Misión del día"} · +{mision.xp} XP</div>
+          <div style={{fontFamily:'"Plus Jakarta Sans",sans-serif',fontWeight:600,fontSize:13,color:"#fff",marginBottom:12}}>{mision.texto}</div>
+          <div style={{display:"flex",gap:8}}>
+            <NumInput value={parseInput(gastoMonto)} onChange={v=>setGastoMonto(String(v))} placeholder={pt?"Valor gasto":"Monto gastado"} style={{padding:"10px 14px",fontSize:14}}/>
+            <button onClick={submitGasto} style={{background:"#FF4B2B",color:"#fff",border:"none",borderRadius:12,padding:"10px 18px",fontFamily:'"Plus Jakarta Sans",sans-serif',fontWeight:700,fontSize:13,cursor:"pointer",flexShrink:0}}>OK</button>
+          </div>
+          <button onClick={()=>setGastoOpen(false)} style={{background:"none",border:"none",color:"#666",fontFamily:'"DM Sans",sans-serif',fontSize:11,cursor:"pointer",width:"100%",marginTop:10,textAlign:"center"}}>Cancelar</button>
+        </div>
+      ):(
       <div onClick={completarMision} style={{background:misionHecha?"#0a130a":"#111",border:"1px solid "+(misionHecha?"#4ade8033":"#2a2a2a"),borderRadius:18,padding:"16px 18px",marginBottom:14,cursor:misionHecha?"default":"pointer",animation:"fadeUp .5s ease .35s both",transition:"all .2s"}}>
         <div style={{display:"flex",alignItems:"center",gap:12}}>
           <span style={{fontSize:26}}>{misionHecha?"✅":mision.emoji}</span>
           <div style={{flex:1}}>
             <div style={{fontFamily:'"DM Sans",sans-serif',fontSize:10,color:misionHecha?"#4ade80":"#FF4B2B",letterSpacing:"1.5px",textTransform:"uppercase",marginBottom:3}}>{pt?"Missão do dia":"Misión del día"} · +{mision.xp} XP</div>
             <div style={{fontFamily:'"Plus Jakarta Sans",sans-serif',fontWeight:600,fontSize:13,color:misionHecha?"#4ade80":"#fff"}}>{mision.texto}</div>
+            {misionHecha&&mision.action==="gasto"&&gastoHoyTotal>0&&<div style={{fontFamily:'"DM Sans",sans-serif',fontSize:11,color:"#888",marginTop:3}}>{pt?"Gasto de hoje: ":"Gasto de hoy: "}{fmtG(gastoHoyTotal)}</div>}
           </div>
-          {!misionHecha&&<div style={{background:"#FF4B2B",borderRadius:8,padding:"4px 10px",fontFamily:'"DM Sans",sans-serif',fontSize:11,fontWeight:600,color:"#fff",flexShrink:0}}>{mision.action?(pt?"Ir →":"Ir →"):(pt?"Marcar feita":"Marcar lista")}</div>}
+          {!misionHecha&&<div style={{background:"#FF4B2B",borderRadius:8,padding:"4px 10px",fontFamily:'"DM Sans",sans-serif',fontSize:11,fontWeight:600,color:"#fff",flexShrink:0}}>{mision.action==="gasto"?"Anotar":mision.action?(pt?"Ir →":"Ir →"):(pt?"Marcar feita":"Marcar lista")}</div>}
         </div>
       </div>
+      )}
       
     </div>
   );
@@ -1808,7 +1821,7 @@ export default function HendyApp(){
   const [goal,setGoal]=useState(sv.goal||null);
   const [retos,setRetos]=useState(sv.retos||[]);
   const [xp,setXp]=useState(sv.xp||0);
-  const [misionDone,setMisionDone]=useState(sv.misionDone||null);
+  const [misionDone,setMisionDone]=useState(sv.misionDone||null);const [gastos,setGastos]=useState(sv.gastos||[]);
   const [toast,setToast]=useState(null);
 
   useEffect(()=>{
@@ -1817,7 +1830,7 @@ export default function HendyApp(){
   },[]);
 
   useEffect(()=>{
-    try{localStorage.setItem("hendy_v5",JSON.stringify({lang,userName,userData,streak,completed,notif,proUntil,goal,retos,xp,misionDone,completedMonth:currentMonth}));}catch(e){}
+      try{localStorage.setItem("hendy_v5",JSON.stringify({lang,userName,userData,streak,completed,notif,proUntil,goal,retos,xp,misionDone,gastos,completedMonth:currentMonth}));}catch(e){}
   },[lang,userName,userData,streak,completed,notif,proUntil,goal,retos,xp,misionDone]);
 
   const showToast=(msg)=>{setToast(msg);setTimeout(()=>setToast(null),3500);};
@@ -1852,7 +1865,7 @@ export default function HendyApp(){
 
   const renderApp=()=>(
     <>
-      {navTab==="dashboard"&&<Dashboard userData={userDataV} streak={streak} completed={completed} onNav={setNavTab} userName={userName} showToast={showToast} onGoHome={()=>setScreen("home")} lang={lang} goal={goal} setGoal={setGoal} xp={xp} setXp={setXp} misionDone={misionDone} setMisionDone={setMisionDone}/>}
+    {navTab==="dashboard"&&<Dashboard userData={userDataV} streak={streak} completed={completed} onNav={setNavTab} userName={userName} showToast={showToast} onGoHome={()=>setScreen("home")} lang={lang} goal={goal} setGoal={setGoal} xp={xp} setXp={setXp} misionDone={misionDone} setMisionDone={setMisionDone} gastos={gastos} setGastos={setGastos}/>}
       {navTab==="academy"&&<Academy userData={userDataV} streak={streak} completed={completed} onComplete={completeLesson} isPro={isPro} onUpgrade={()=>setNavTab("pro")} lang={lang}/>}
       {navTab==="logros"&&<Logros completed={completed} streak={streak} userData={userDataV} lang={lang}/>}
       {navTab==="retos"&&<RetosScreen retos={retos} setRetos={setRetos} lang={lang} showToast={showToast} onAction={()=>checkMision("retos")} onNav={setNavTab}/>}
