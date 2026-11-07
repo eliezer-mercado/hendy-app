@@ -1568,7 +1568,7 @@ function Dashboard({userData,streak,completed,onNav,userName,showToast,onGoHome,
   const misionHecha=misionDone===todayKey;
   const completarMision=()=>{
     if(misionHecha)return;
-    if(mision.action){ onNav(mision.action); return; }
+    if(mision.action==="gasto"){ setGastoOpen(true); return; } if(mision.action){ onNav(mision.action); return; }
     setMisionDone(todayKey);
     setXp(function(x){return x+(mision.xp||20);});
     showToast&&showToast({emoji:mision.emoji,titulo:pt?"Missão concluída! +"+mision.xp+" XP":"¡Misión completada! +"+mision.xp+" XP",desc:mision.texto});
