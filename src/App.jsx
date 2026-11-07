@@ -1564,7 +1564,7 @@ function Dashboard({userData,streak,completed,onNav,userName,showToast,onGoHome,
   const nivel=getNivel(score);
   const proxNivel=getProxNivel(score);
   const mision=getMisionDelDia(lang);
-  const todayKey="mision_"+new Date().toISOString().slice(0,10);
+  const todayKey="mision_"+new Date().toISOString().slice(0,10);const todayISO=new Date().toISOString().slice(0,10);const gastoHoyTotal=(gastos||[]).filter(function(g){return g.fecha===todayISO;}).reduce(function(s,g){return s+(g.monto||0);},0);const fmtG=function(n){return (pt?"R$ ":"G ")+Number(n||0).toLocaleString(pt?"pt-BR":"es-PY");};const submitGasto=function(){var monto=Number(gastoMonto)||0;if(monto<=0)return;setGastos(function(list){return [...(list||[]),{id:Date.now(),monto:monto,fecha:todayISO}];});setGastoMonto("");setGastoOpen(false);setMisionDone(todayKey);setXp(function(x){return x+(mision.xp||20);});showToast&&showToast({emoji:mision.emoji,titulo:pt?"Missão concluída! +"+mision.xp+" XP":"¡Misión completada! +"+mision.xp+" XP",desc:mision.texto});};
   const misionHecha=misionDone===todayKey;
   const completarMision=()=>{
     if(misionHecha)return;
