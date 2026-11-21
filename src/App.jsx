@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffecht, useRef } from "react";
 
 const QUESTIONS_ES = [
   {id:"situacion",pregunta:"¿Cómo describirías tu situación económica hoy?",sub:"Sé honesto/a. Nadie más lo verá.",
@@ -1556,7 +1556,7 @@ function SuenoCard({userData,lang,goal,setGoal}){
 
 function Dashboard({userData,streak,completed,onNav,userName,showToast,onGoHome,lang,goal,setGoal,xp,setXp,misionDone,setMisionDone,gastos,setGastos}){
   const pt=lang==="pt";
-  const [waitDone,setWaitDone]=useState(false);const [gastoOpen,setGastoOpen]=useState(false);const [gastoMonto,setGastoMonto]=useState("");
+  const [waitDone,setWaitDone]=useState(false);const [gastoOpen,setGastoOpen]=useState(false);const [gastoMonto,setGastoMonto]=useState("");const [quickGastoOpen,setQuickGastoOpen]=useState(false);const [quickGastoMonto,setQuickGastoMonto]=useState("");
   const diagScore=userData&&userData.diagnostico?userData.diagnostico.score:0;
   const score=calcScore(diagScore,completed.length);
   const breakdown=calcBreakdown(userData,completed.length,goal);
@@ -1564,7 +1564,7 @@ function Dashboard({userData,streak,completed,onNav,userName,showToast,onGoHome,
   const nivel=getNivel(score);
   const proxNivel=getProxNivel(score);
   const mision=getMisionDelDia(lang);
-  const todayKey="mision_"+new Date().toISOString().slice(0,10);const todayISO=new Date().toISOString().slice(0,10);const gastoHoyTotal=(gastos||[]).filter(function(g){return g.fecha===todayISO;}).reduce(function(s,g){return s+(g.monto||0);},0);const fmtG=function(n){return (pt?"R$ ":"G ")+Number(n||0).toLocaleString(pt?"pt-BR":"es-PY");};const submitGasto=function(){var monto=Number(gastoMonto)||0;if(monto<=0)return;setGastos(function(list){return [...(list||[]),{id:Date.now(),monto:monto,fecha:todayISO}];});setGastoMonto("");setGastoOpen(false);setMisionDone(todayKey);setXp(function(x){return x+(mision.xp||20);});showToast&&showToast({emoji:mision.emoji,titulo:pt?"Missão concluída! +"+mision.xp+" XP":"¡Misión completada! +"+mision.xp+" XP",desc:mision.texto});};
+  const todayKey="mision_"+new Date().toISOString().slice(0,10);const todayISO=new Date().toISOString().slice(0,10);const gastoHoyTotal=(gastos||[]).filter(function(g){return g.fecha===todayISO;}).reduce(function(s,g){return s+(g.monto||0);},0);const fmtG=function(n){return (pt?"R$ ":"G ")+Number(n||0).toLocaleString(pt?"pt-BR":"es-PY");};const submitGasto=function(){var monto=Number(gastoMonto)||0;if(monto<=0)return;setGastos(function(list){return [...(list||[]),{id:Date.now(),monto:monto,fecha:todayISO}];});asetGastoMonto("");setGastoOpen(false);setMisionDone(todayKey);setXp(function(x){return x+(mision.xp||20);});showToast&&showToast({emoji:mision.emoji,titulo:pt?"Missão concluída! +"+mision.xp+" XP":"¡Misión completada! +"+mision.xp+" XP",desc:mision.texto});};const submitQuickGasto=function(){var monto=Number(quickGastoMonto)||0;if(monto<=0)return;setGastos(function(list){return [...(list||[]),{id:Date.now(),monto:monto,fecha:todayISO}];});setQuickGastoMonto("");setQuickGastoOpen(false);if(mision.action==="gasto"&&!misionHecha){setMisionDone(todayKey);setXp(function(x){return x+(mision.xp||20);});}showToast&&showToast({emoji:"💸",titulo:pt?"Gasto registrado":"Gasto registrado",desc:fmtG(monto)});};
   const misionHecha=misionDone===todayKey;
   const completarMision=()=>{
     if(misionHecha)return;
@@ -1657,7 +1657,7 @@ function Dashboard({userData,streak,completed,onNav,userName,showToast,onGoHome,
           </div>
         </div>
       )}
-            {gastoOpen&&!misionHecha?(
+a{quickGastoOpen?(<div style={{background:"#111",border:"1px solid #2a2a2a",borderRadius:18,padding:"16px 18px",marginBottom:14,animation:"fadeUp .5s ease .3s both"}}><div style={{fontFamily:'"DM Sans",sans-serif',fontSize:10,color:"#FF4B2B",letterSpacing:"1.5px",textTransform:"uppercase",marginBottom:10}}>{pt?"Anotar gasto":"Anotar gasto"}</div><div style={{display:"flex",gap:8}}><NumInput value={parseInput(quickGastoMonto)} onChange={v=>setQuickGastoMonto(String(v))} placeholder={pt?"Valor gasto":"Monto gastado"} style={{padding:"10px 14px",fontSize:14}}/><button onClick={submitQuickGasto} style={{background:"#FF4B2B",color:"#fff",border:"none",borderRadius:12,padding:"10px 18px",fontFamily:'"Plus Jakarta Sans",sans-serif',fontWeight:700,fontSize:13,cursor:"pointer",flexShrink:0}}>OK</button></div><button onClick={()=>setQuickGastoOpen(false)} style={{background:"none",border:"none",color:"#666",fontFamily:'"DM Sans",sans-serif',fontSize:11,cursor:"pointer",width:"100%",marginTop:10,textAlign:"center"}}>Cancelar</button></div>):(<button onClick={()=>setQuickGastoOpen(true)} style={{width:"100%",background:"linear-gradient(135deg,#1a0a08,#1a0d1a)",border:"1px solid #FF4B2B44",borderRadius:18,padding:"16px 18px",display:"flex",alignItems:"center",gap:12,cursor:"pointer",marginBottom:14,animation:"fadeUp .5s ease .3s both"}}><span style={{fontSize:26}}>💸</span><div style={{flex:1,textAlign:"left"}}><div style={{fontFamily:'"Plus Jakarta Sans",sans-serif',fontWeight:700,fontSize:14,color:"#fff"}}>{pt?"Anotar gasto":"Anotar gasto"}</div><div style={{fontFamily:'"DM Sans",sans-serif',fontWeight:300,fontSize:12,color:"#888",marginTop:2}}>{gastoHoyTotal>0?(pt?"Hoje: ":"Hoy: ")+fmtG(gastoHoyTotal):(pt?"Registre seus gastos do dia":"Registrá los gastos del día")}</div></div><span style={{color:"#FF4B2B",fontSize:18}}>›</span></button>)}            {gastoOpen&&!misionHecha?(
         <div style={{background:"#111",border:"1px solid #2a2a2a",borderRadius:18,padding:"16px 18px",marginBottom:14,animation:"fadeUp .5s ease .35s both"}}>
           <div style={{fontFamily:'"DM Sans",sans-serif',fontSize:10,color:"#FF4B2B",letterSpacing:"1.5px",textTransform:"uppercase",marginBottom:10}}>{pt?"Missão do dia":"Misión del día"} · +{mision.xp} XP</div>
           <div style={{fontFamily:'"Plus Jakarta Sans",sans-serif',fontWeight:600,fontSize:13,color:"#fff",marginBottom:12}}>{mision.texto}</div>
@@ -1674,7 +1674,7 @@ function Dashboard({userData,streak,completed,onNav,userName,showToast,onGoHome,
           <div style={{flex:1}}>
             <div style={{fontFamily:'"DM Sans",sans-serif',fontSize:10,color:misionHecha?"#4ade80":"#FF4B2B",letterSpacing:"1.5px",textTransform:"uppercase",marginBottom:3}}>{pt?"Missão do dia":"Misión del día"} · +{mision.xp} XP</div>
             <div style={{fontFamily:'"Plus Jakarta Sans",sans-serif',fontWeight:600,fontSize:13,color:misionHecha?"#4ade80":"#fff"}}>{mision.texto}</div>
-            {misionHecha&&mision.action==="gasto"&&gastoHoyTotal>0&&<div style={{fontFamily:'"DM Sans",sans-serif',fontSize:11,color:"#888",marginTop:3}}>{pt?"Gasto de hoje: ":"Gasto de hoy: "}{fmtG(gastoHoyTotal)}</div>}
+            
           </div>
           {!misionHecha&&<div style={{background:"#FF4B2B",borderRadius:8,padding:"4px 10px",fontFamily:'"DM Sans",sans-serif',fontSize:11,fontWeight:600,color:"#fff",flexShrink:0}}>{mision.action==="gasto"?"Anotar":mision.action?(pt?"Ir →":"Ir →"):(pt?"Marcar feita":"Marcar lista")}</div>}
         </div>
