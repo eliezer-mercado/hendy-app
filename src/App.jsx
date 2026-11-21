@@ -1,4 +1,4 @@
-import { useState, useEffecht, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 
 const QUESTIONS_ES = [
   {id:"situacion",pregunta:"¿Cómo describirías tu situación económica hoy?",sub:"Sé honesto/a. Nadie más lo verá.",
